@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#3b2a1f" />
+  <title>Kaffeebohnen & Mahlgrad</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%98%95%3C/text%3E%3C/svg%3E" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>☕ Kaffeebohnen</h1>
+    <p class="subtitle">Mahlgrad-Vorschlag &amp; eigene Werte speichern</p>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-tab="list" role="tab">🫘 Bohnen <span class="count" id="bean-count">0</span></button>
+    <button class="tab" data-tab="add" role="tab">➕ Neu</button>
+    <button class="tab" data-tab="info" role="tab">ℹ️ Info</button>
+  </nav>
+
+  <main>
+    <!-- Tab: Bohnen-Liste -->
+    <section class="tab-panel active" id="tab-list" role="tabpanel">
+      <input type="search" id="search" placeholder="🔎 Suchen (Name, Herkunft, Noten)…" autocomplete="off" />
+      <div id="bean-list"></div>
+      <p class="empty-state" id="empty-state" hidden>
+        Noch keine Bohnen angelegt.<br />Wechsel auf <strong>➕ Neu</strong>.
+      </p>
+    </section>
+
+    <!-- Tab: Neue Bohne -->
+    <section class="tab-panel" id="tab-add" role="tabpanel">
+      <form id="add-form">
+        <label>
+          Name der Bohne *
+          <input type="text" name="name" required maxlength="80" autocomplete="off" />
+        </label>
+        <label>
+          Herkunft (z. B. Äthiopien)
+          <input type="text" name="herkunft" maxlength="80" autocomplete="off" />
+        </label>
+        <label>
+          Röstgrad: <span class="slider-value" data-for="roestgrad">5</span> / 10
+          <input type="range" name="roestgrad" min="1" max="10" step="1" value="5" />
+          <small>1 = sehr hell · 10 = sehr dunkel</small>
+        </label>
+        <label>
+          Robusta-Anteil: <span class="slider-value" data-for="robusta_anteil">0</span> %
+          <input type="range" name="robusta_anteil" min="0" max="100" step="5" value="0" />
+        </label>
+        <label>
+          Geschmacksnoten
+          <input type="text" name="geschmacksnoten" maxlength="120" autocomplete="off" placeholder="Schokolade, Beere, Nuss…" />
+        </label>
+        <label>
+          Notizen
+          <textarea name="notizen" rows="3" maxlength="500"></textarea>
+        </label>
+        <button type="submit" class="primary">Bohne speichern</button>
+      </form>
+    </section>
+
+    <!-- Tab: Info -->
+    <section class="tab-panel" id="tab-info" role="tabpanel">
+      <h2>Mahlgrad-Skala (1–30)</h2>
+      <ul class="scale-info">
+        <li><strong>1–10</strong> fein — Espresso</li>
+        <li><strong>11–20</strong> mittel — Filter, Over Ice</li>
+        <li><strong>21–30</strong> grob — Cold Brew</li>
+      </ul>
+      <h2>Richtwerte pro Brühmethode</h2>
+      <ul class="scale-info">
+        <li><strong>Espresso</strong> ≈ 8 (wie Puderzucker)</li>
+        <li><strong>Filter</strong> ≈ 18 (wie grober Sand)</li>
+        <li><strong>Over Ice</strong> ≈ 15 (Japanese Iced Coffee)</li>
+        <li><strong>Cold Brew</strong> ≈ 28 (wie Meersalz)</li>
+      </ul>
+      <h2>Vorschlags-Logik</h2>
+      <p>Dunklere Röstung → gröber. Höherer Robusta-Anteil → leicht feiner. Der Vorschlag ist ganzzahlig (1–30).</p>
+      <h2>Daten</h2>
+      <p>Daten werden nur in diesem Browser (localStorage) gespeichert. Nichts verlässt dein Gerät.</p>
+      <div class="danger-zone">
+        <button id="export-btn">Daten als JSON exportieren</button>
+        <label class="import-label">
+          Daten aus JSON importieren
+          <input type="file" id="import-input" accept="application/json" hidden />
+        </label>
+        <button id="reset-btn" class="danger">Alle Daten löschen</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Bearbeiten-Dialog -->
+  <dialog id="edit-dialog">
+    <form method="dialog" id="edit-form">
+      <h2>Bohne bearbeiten</h2>
+      <label>
+        Name
+        <input type="text" name="name" required maxlength="80" />
+      </label>
+      <label>
+        Herkunft
+        <input type="text" name="herkunft" maxlength="80" />
+      </label>
+      <label>
+        Röstgrad: <span class="slider-value" data-for="roestgrad">5</span> / 10
+        <input type="range" name="roestgrad" min="1" max="10" step="1" />
+      </label>
+      <label>
+        Robusta-Anteil: <span class="slider-value" data-for="robusta_anteil">0</span> %
+        <input type="range" name="robusta_anteil" min="0" max="100" step="5" />
+      </label>
+      <label>
+        Geschmacksnoten
+        <input type="text" name="geschmacksnoten" maxlength="120" />
+      </label>
+      <label>
+        Notizen
+        <textarea name="notizen" rows="3" maxlength="500"></textarea>
+      </label>
+      <div class="dialog-buttons">
+        <button type="button" id="edit-cancel">Abbrechen</button>
+        <button type="submit" class="primary" id="edit-save">Speichern</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
